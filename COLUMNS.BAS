@@ -1,27 +1,23 @@
+DECLARE SUB ZASTAWKA ()
+DECLARE SUB BONUS (zw!)
 DECLARE SUB Game (sp!(), so!(), si!(), zw!, o!)
 DECLARE SUB GameScreen (sp!(), rek!)
-DECLARE SUB RecordBroken ()
-DECLARE SUB Quit ()
+DECLARE SUB KEYCLER ()
+DECLARE SUB MENU (sp!(), so!(), si!())
+DECLARE SUB NXT (so!(), fg!())
 DECLARE SUB pau ()
-DECLARE SUB ZASTAWKA ()
-DECLARE SUB EXT ()
-DECLARE SUB STP (zw!)
-DECLARE SUB IGRA (sp!(), so!(), si!(), zw!, o!)
-DECLARE SUB BONUS (zw!)
-DECLARE SUB IKRAN (sp!(), rek!)
-DECLARE SUB ZAPRET ()
+DECLARE SUB PST (x!, y!, z!, fg!(), so!())
+DECLARE SUB PSTC (x!, y!, z!, si!())
+DECLARE SUB Quit ()
+DECLARE SUB RecordBroken ()
+DECLARE SUB SCORE (o!)
+DECLARE SUB SPRITE ()
 DECLARE SUB WZA (zw!)
 DECLARE SUB WZB (zw!)
 DECLARE SUB WZC (zw!)
 DECLARE SUB WZD (zw!)
 DECLARE SUB WZE (zw!)
-DECLARE SUB SCORE (o!)
-DECLARE SUB KEYCLER ()
-DECLARE SUB PSTC (x!, y!, z!, si!())
-DECLARE SUB NXT (so!(), fg!())
-DECLARE SUB PST (x!, y!, z!, fg!(), so!())
-DECLARE SUB MENU (sp!(), so!(), si!())
-DECLARE SUB SPRITE ()
+DECLARE SUB StopSound (sndenable!)
 
 ZASTAWKA
 SPRITE
@@ -66,158 +62,203 @@ END IF
 END SUB
 
 SUB Game (sp(), so(), si(), zw, o)
-speed = 10
-u$ = CHR$(0) + CHR$(72): d$ = CHR$(0) + CHR$(80)
-l$ = CHR$(0) + CHR$(75): r$ = CHR$(0) + CHR$(77)
-REDIM fg(3, 7), m(0 TO 7, 12): o = 0
-CALL GameScreen(sp(), 1000)
-'CALL GameScreen(sp(), rek)
-COLOR 9: LOCATE 12, 18: PRINT "ë‚†‡‚ - ´Ó°†Ô ™´†¢®Ë†."
-KEYCLER: DO: q$ = INKEY$: LOCATE 1, 36: COLOR 10: PRINT LEFT$(TIME$, 5)
-FOR a = 1 TO 7: FOR s = 1 TO 3: fg(s, a) = INT(RND * 5 + 1): NEXT: NEXT
-CALL NXT(so(), fg())
-LOOP UNTIL q$ <> "": LOCATE 12, 18: PRINT "                      "
-
+    speed = 10
+    u$ = CHR$(0) + CHR$(72): d$ = CHR$(0) + CHR$(80)
+    l$ = CHR$(0) + CHR$(75): r$ = CHR$(0) + CHR$(77)
+    REDIM fg(3, 7), m(0 TO 7, 12): o = 0
+    CALL GameScreen(sp(), rek)
+    COLOR 9: LOCATE 12, 18: PRINT "ë‚†‡‚ - ´Ó°†Ô ™´†¢®Ë†."
+    KEYCLER
+    DO
+        q$ = INKEY$: LOCATE 1, 36: COLOR 10: PRINT LEFT$(TIME$, 5)
+        FOR a = 1 TO 7: FOR s = 1 TO 3: fg(s, a) = INT(RND * 5 + 1): NEXT: NEXT
+        CALL NXT(so(), fg())
+    LOOP UNTIL q$ <> "": LOCATE 12, 18: PRINT "                      "
 
 new:
-IF o > rek THEN RecordBroken
-x = 3: y = 9: z = 4
-IF m(3, 9) <> 0 THEN GOTO pro
-KEYCLER
-10 : LOCATE 1, 36: COLOR 10: PRINT LEFT$(TIME$, 5)
-CALL PST(x, y, z, fg(), so())
-z = z - 1
+    IF o > rek THEN RecordBroken
+    x = 3: y = 9: z = 0
+    KEYCLER
 
-IF z = -1 THEN
-z = 15
-IF y = 1 THEN GOTO STP
-IF m(x, y - 1) <> 0 THEN GOTO STP
-y = y - 1
-END IF
-11 : q$ = INKEY$
-IF q$ = CHR$(27) THEN GOTO pr1
-IF q$ = d$ THEN
-CALL PSTC(x, y, z, si()): z = 0
-plus = 1: FOR a = 1 TO 11: IF m(x, a) > 0 THEN plus = plus + 1
-NEXT: y = plus: CALL PST(x, y, z, fg(), so())
-GOTO STP
-END IF
-IF q$ = l$ THEN
-IF x = 1 THEN GOTO 11
-IF m(x - 1, y) = 0 THEN CALL PSTC(x, y, z, si()): x = x - 1: CALL PST(x, y, z, fg(), so())
-END IF
-IF q$ = r$ THEN
-IF x = 6 THEN GOTO 11
-IF m(x + 1, y) = 0 THEN CALL PSTC(x, y, z, si()): x = x + 1: CALL PST(x, y, z, fg(), so())
-END IF
-IF q$ = u$ THEN a = fg(3, 1): fg(3, 1) = fg(2, 1): fg(2, 1) = fg(1, 1): fg(1, 1) = a: CALL PST(x, y, z, fg(), so()): GOTO 11
-FOR s = 1 TO speed: SOUND 30000, .1: NEXT: GOTO 10
-STP: CALL STP(zw)
-FOR a = 1 TO 3: m(x, y - 1 + a) = fg(a, 1): NEXT
-prw = 0: bn = 0
-prow: REDIM wx(66), wy(66)
-z = 1
-prw = prw + 1
-FOR a = 1 TO 6: FOR s = 1 TO 11
-IF m(a, s) = 0 THEN EXIT FOR
+10 :
+    LOCATE 1, 36: COLOR 10: PRINT LEFT$(TIME$, 5)
+    CALL PST(x, y, z, fg(), so())
+    z = z - 1
+    IF z = -1 THEN
+        z = 15
+        IF y = 1 THEN GOTO STP
+        IF m(x, y - 1) <> 0 THEN GOTO STP
+        y = y - 1
+    END IF
 
-plus = 1
-FOR d = 1 TO 6: IF m(a, s) = m(a + d, s) THEN plus = plus + 1 ELSE EXIT FOR
-NEXT
-IF plus > 2 THEN FOR d = 0 TO plus - 1: wx(z) = a + d: wy(z) = s: z = z + 1: NEXT
+11 :
+    q$ = INKEY$
+    IF q$ = CHR$(27) THEN GOTO pr1
+    IF q$ = d$ THEN
+        CALL PSTC(x, y, z, si()): z = 0
+        plus = 1: FOR a = 1 TO 11: IF m(x, a) > 0 THEN plus = plus + 1
+        NEXT: y = plus: CALL PST(x, y, z, fg(), so())
+        GOTO STP
+    END IF
+    IF q$ = l$ THEN
+        IF x = 1 THEN GOTO 11
+        IF m(x - 1, y) = 0 THEN CALL PSTC(x, y, z, si()): x = x - 1: CALL PST(x, y, z, fg(), so())
+    END IF
+    IF q$ = r$ THEN
+        IF x = 6 THEN GOTO 11
+        IF m(x + 1, y) = 0 THEN CALL PSTC(x, y, z, si()): x = x + 1: CALL PST(x, y, z, fg(), so())
+    END IF
+    IF q$ = u$ THEN a = fg(3, 1): fg(3, 1) = fg(2, 1): fg(2, 1) = fg(1, 1): fg(1, 1) = a: CALL PST(x, y, z, fg(), so()): GOTO 11
+    FOR s = 1 TO speed: SOUND 30000, .1: NEXT: GOTO 10
 
-plus = 1
-FOR d = 1 TO 6: IF m(a, s) = m(a + d, s + d) THEN plus = plus + 1 ELSE EXIT FOR
-NEXT
-IF plus > 2 THEN FOR d = 0 TO plus - 1: wx(z) = a + d: wy(z) = s + d: z = z + 1: NEXT
-
-plus = 1
-FOR d = 1 TO 6: IF m(a, s) = m(a, s + d) THEN plus = plus + 1 ELSE EXIT FOR
-NEXT
-IF plus > 2 THEN FOR d = 0 TO plus - 1: wx(z) = a: wy(z) = s + d: z = z + 1: NEXT
-
-plus = 1
-FOR d = 1 TO 6: IF m(a, s) = m(a - d, s + d) THEN plus = plus + 1 ELSE EXIT FOR
-NEXT
-IF plus > 2 THEN FOR d = 0 TO plus - 1: wx(z) = a - d: wy(z) = s + d: z = z + 1: NEXT
-
-NEXT: NEXT: plus = 0
-FOR a = 1 TO 66: IF wx(a) > 0 THEN plus = plus + 1
-NEXT
-IF plus <> 0 THEN
-FOR a = 1 TO plus: PUT (wx(a) * 16 + 1, wy(a) * 16 + 1), si(1), PSET: NEXT
-CALL WZA(zw)
-FOR a = 1 TO plus: PUT (wx(a) * 16 + 1, wy(a) * 16 + 1), si(34), PSET: NEXT
-CALL WZB(zw)
-FOR a = 1 TO plus: PUT (wx(a) * 16 + 1, wy(a) * 16 + 1), si(67), PSET: NEXT
-CALL WZC(zw)
-FOR a = 1 TO plus: PUT (wx(a) * 16 + 1, wy(a) * 16 + 1), si(100), PSET: NEXT
-CALL WZD(zw)
-FOR a = 1 TO plus: PUT (wx(a) * 16 + 1, wy(a) * 16 + 1), si(133), PSET: NEXT
-CALL WZE(zw)
-
-
-FOR a = 1 TO plus
-IF prw = 1 THEN o = o + 1: CALL SCORE(o)
-IF prw > 1 THEN bn = bn + (prw - 1) * 10
-NEXT
-
-
-FOR a = 1 TO plus: m(wx(a), wy(a)) = 0: NEXT
-DO: plus = 0: FOR a = 1 TO 6: FOR s = 1 TO 10
-IF m(a, s) = 0 AND m(a, s + 1) <> 0 THEN m(a, s) = m(a, s + 1): m(a, s + 1) = 0: plus = 1
-NEXT: NEXT
-FOR a = 1 TO 6: FOR s = 1 TO 11
-IF m(a, s) = 0 THEN PUT (a * 16 + 1, s * 16 + 1), si(133), PSET
-IF m(a, s) > 0 THEN PUT (a * 16 + 1, s * 16 + 1), so(m(a, s) * 33 - 32), PSET
-NEXT: NEXT
-FOR s = 0 TO 15: PALETTE s, s: NEXT
-
-
-LOOP UNTIL plus = 0
-
-
-GOTO prow
-END IF
-
-IF bn > 0 THEN
-LOCATE 12, 24: COLOR 9: PRINT "Åéçìë";
-COLOR 14: PRINT bn;
-COLOR 9: PRINT "!"
-CALL BONUS(zw)
-LOCATE 12, 24: COLOR 0: PRINT "     "; bn; "   "
-o = o + bn: CALL SCORE(o)
-END IF
-
-FOR a = 1 TO 6: FOR s = 1 TO 3
-fg(s, a) = fg(s, a + 1): NEXT: NEXT
-FOR a = 1 TO 3: fg(a, 7) = INT(RND * 5 + 1): NEXT
-CALL NXT(so(), fg())
-GOTO new
+'é·‚†≠Æ¢™†
+STP:
+    CALL StopSound(zw)
+    IF m(3, 9) <> 0 THEN GOTO GameOver
+    FOR a = 1 TO 3: m(x, y - 1 + a) = fg(a, 1): NEXT
+    prw = 0: bn = 0
+prow:
+    REDIM wx(66), wy(66)
+    z = 1
+    prw = prw + 1
+    FOR a = 1 TO 6
+        FOR s = 1 TO 11
+            IF m(a, s) = 0 THEN EXIT FOR
+            plus = 1
+            FOR d = 1 TO 6
+                IF m(a, s) = m(a + d, s) THEN plus = plus + 1 ELSE EXIT FOR
+            NEXT
+            IF plus > 2 THEN FOR d = 0 TO plus - 1: wx(z) = a + d: wy(z) = s: z = z + 1: NEXT
+            plus = 1
+            FOR d = 1 TO 6
+                IF m(a, s) = m(a + d, s + d) THEN plus = plus + 1 ELSE EXIT FOR
+            NEXT
+            IF plus > 2 THEN FOR d = 0 TO plus - 1: wx(z) = a + d: wy(z) = s + d: z = z + 1: NEXT
+            plus = 1
+            FOR d = 1 TO 6
+                IF m(a, s) = m(a, s + d) THEN plus = plus + 1 ELSE EXIT FOR
+            NEXT
+            IF plus > 2 THEN FOR d = 0 TO plus - 1: wx(z) = a: wy(z) = s + d: z = z + 1: NEXT
+            plus = 1
+            FOR d = 1 TO 6
+                IF m(a, s) = m(a - d, s + d) THEN plus = plus + 1 ELSE EXIT FOR
+            NEXT
+            IF plus > 2 THEN FOR d = 0 TO plus - 1: wx(z) = a - d: wy(z) = s + d: z = z + 1: NEXT
+        NEXT
+    NEXT
+    plus = 0
+    FOR a = 1 TO 66
+        IF wx(a) > 0 THEN plus = plus + 1
+    NEXT
+    IF plus <> 0 THEN
+        FOR a = 1 TO plus
+            PUT (wx(a) * 16 + 1, wy(a) * 16 + 1), si(1), PSET
+        NEXT
+        CALL WZA(zw)
+        FOR a = 1 TO plus
+            PUT (wx(a) * 16 + 1, wy(a) * 16 + 1), si(34), PSET
+        NEXT
+        CALL WZB(zw)
+        FOR a = 1 TO plus
+            PUT (wx(a) * 16 + 1, wy(a) * 16 + 1), si(67), PSET
+        NEXT
+        CALL WZC(zw)
+        FOR a = 1 TO plus
+            PUT (wx(a) * 16 + 1, wy(a) * 16 + 1), si(100), PSET
+        NEXT
+        CALL WZD(zw)
+        FOR a = 1 TO plus
+            PUT (wx(a) * 16 + 1, wy(a) * 16 + 1), si(133), PSET
+        NEXT
+        CALL WZE(zw)
+        FOR a = 1 TO plus
+            IF prw = 1 THEN o = o + 1: CALL SCORE(o)
+            IF prw > 1 THEN bn = bn + (prw - 1) * 10
+        NEXT
+        FOR a = 1 TO plus: m(wx(a), wy(a)) = 0: NEXT
+        DO
+            plus = 0
+            FOR a = 1 TO 6
+                FOR s = 1 TO 10
+                    IF m(a, s) = 0 AND m(a, s + 1) <> 0 THEN m(a, s) = m(a, s + 1): m(a, s + 1) = 0: plus = 1
+                NEXT
+            NEXT
+            FOR a = 1 TO 6
+                FOR s = 1 TO 11
+                    IF m(a, s) = 0 THEN PUT (a * 16 + 1, s * 16 + 1), si(133), PSET
+                    IF m(a, s) > 0 THEN PUT (a * 16 + 1, s * 16 + 1), so(m(a, s) * 33 - 32), PSET
+                NEXT
+            NEXT
+            FOR s = 0 TO 15: PALETTE s, s: NEXT
+        LOOP UNTIL plus = 0
+        GOTO prow
+    END IF
+    IF bn > 0 THEN
+        LOCATE 12, 24: COLOR 9: PRINT "Åéçìë";
+        COLOR 14: PRINT bn;
+        COLOR 9: PRINT "!"
+        CALL BONUS(zw)
+        LOCATE 12, 24: COLOR 0: PRINT "     "; bn; "   "
+        o = o + bn: CALL SCORE(o)
+    END IF
+    FOR a = 1 TO 6
+        FOR s = 1 TO 3
+            fg(s, a) = fg(s, a + 1)
+        NEXT
+    NEXT
+    FOR a = 1 TO 3: fg(a, 7) = INT(RND * 5 + 1): NEXT
+    CALL NXT(so(), fg())
+    GOTO new
 pr1:
-PCOPY 0, 1: COLOR 1
-LOCATE 11, 10: PRINT "⁄ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒø"
-LOCATE 12, 10: PRINT "≥                    ≥"
-LOCATE 13, 10: PRINT "¿ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒŸ"
-COLOR 14: LOCATE 12, 12: PRINT "ÇÎ „¢•‡•≠Î ? (Y/N)"
-DO: q$ = INKEY$: LOOP UNTIL q$ <> ""
-IF q$ <> "Y" AND q$ <> "y" AND q$ <> "≠" AND q$ <> "ç" THEN : PCOPY 1, 0: GOTO 11
-PCOPY 1, 0
-pro:
-FOR a = 1 TO 6: FOR s = 1 TO 11: IF m(a, s) > 0 THEN PUT (a * 16 + 1, s * 16 + 1), si(1), PSET
-NEXT: NEXT: CALL WZA(zw): FOR a = 1 TO 6: FOR s = 1 TO 11: IF m(a, s) > 0 THEN PUT (a * 16 + 1, s * 16 + 1), si(34), PSET
-NEXT: NEXT: CALL WZB(zw): FOR a = 1 TO 6: FOR s = 1 TO 11: IF m(a, s) > 0 THEN PUT (a * 16 + 1, s * 16 + 1), si(67), PSET
-NEXT: NEXT: CALL WZC(zw): FOR a = 1 TO 6: FOR s = 1 TO 11: IF m(a, s) > 0 THEN PUT (a * 16 + 1, s * 16 + 1), si(100), PSET
-NEXT: NEXT: CALL WZD(zw): FOR a = 1 TO 6: FOR s = 1 TO 11: IF m(a, s) > 0 THEN PUT (a * 16 + 1, s * 16 + 1), si(133), PSET
-NEXT: NEXT: CALL WZE(zw)
-FOR a = 0 TO 300 STEP 2
-PSET (a, 1), 0: DRAW "h100e100"
-PSET (320 - a, 1), 0: DRAW "e100h100"
-PSET (a - 21, 1), 0: DRAW "h100e100"
-PSET (341 - a, 1), 0: DRAW "e100h100"
-LOCATE 1, 36: COLOR 10: PRINT LEFT$(TIME$, 5)
-SOUND 30000, .2
-NEXT
+    PCOPY 0, 1: COLOR 1
+    LOCATE 11, 10: PRINT "⁄ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒø"
+    LOCATE 12, 10: PRINT "≥                    ≥"
+    LOCATE 13, 10: PRINT "¿ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒŸ"
+    COLOR 14: LOCATE 12, 12: PRINT "ÇÎ „¢•‡•≠Î ? (Y/N)"
+    DO: q$ = INKEY$: LOOP UNTIL q$ <> ""
+    IF q$ <> "Y" AND q$ <> "y" AND q$ <> "≠" AND q$ <> "ç" THEN : PCOPY 1, 0: GOTO 11
+    PCOPY 1, 0
+
+'è‡Æ®£‡Î¢†≠®•
+GameOver:
+    FOR a = 1 TO 6
+        FOR s = 1 TO 11
+            IF m(a, s) > 0 THEN PUT (a * 16 + 1, s * 16 + 1), si(1), PSET
+        NEXT
+    NEXT
+    CALL WZA(zw)
+    FOR a = 1 TO 6
+        FOR s = 1 TO 11
+            IF m(a, s) > 0 THEN PUT (a * 16 + 1, s * 16 + 1), si(34), PSET
+        NEXT
+    NEXT
+    CALL WZB(zw)
+    FOR a = 1 TO 6
+        FOR s = 1 TO 11
+            IF m(a, s) > 0 THEN PUT (a * 16 + 1, s * 16 + 1), si(67), PSET
+        NEXT
+    NEXT
+    CALL WZC(zw)
+    FOR a = 1 TO 6
+        FOR s = 1 TO 11
+            IF m(a, s) > 0 THEN PUT (a * 16 + 1, s * 16 + 1), si(100), PSET
+        NEXT
+    NEXT
+    CALL WZD(zw)
+    FOR a = 1 TO 6
+        FOR s = 1 TO 11
+            IF m(a, s) > 0 THEN PUT (a * 16 + 1, s * 16 + 1), si(133), PSET
+        NEXT
+    NEXT
+    CALL WZE(zw)
+    FOR a = 0 TO 300 STEP 2
+        PSET (a, 1), 0: DRAW "h100e100"
+        PSET (320 - a, 1), 0: DRAW "e100h100"
+        PSET (a - 21, 1), 0: DRAW "h100e100"
+        PSET (341 - a, 1), 0: DRAW "e100h100"
+        LOCATE 1, 36: COLOR 10: PRINT LEFT$(TIME$, 5)
+        SOUND 30000, .2
+    NEXT
 END SUB
 
 SUB GameScreen (sp(), rek)
@@ -309,12 +350,12 @@ PCOPY 0, 1
         IF k < 0 THEN k = 0
         IF k > ch - 13 THEN k = ch - 13
         COLOR 0, 3
-        LOCATE 6, 36: PRINT CHR$(24)
-        LOCATE 18, 36: PRINT CHR$(25)
+        LOCATE 6, 37: PRINT CHR$(24)
+        LOCATE 18, 37: PRINT CHR$(25)
         COLOR 9, 0
-        FOR a = 7 TO 17: LOCATE a, 36: PRINT "±": NEXT
+        FOR a = 7 TO 17: LOCATE a, 37: PRINT "±": NEXT
         COLOR 9
-        LOCATE (k) / (ch - 13) * 10 + 7, 36: PRINT "€"
+        LOCATE (k) / (ch - 13) * 10 + 7, 37: PRINT "€"
         LOCATE 21, 1
         COLOR 15, 1
         PRINT "   "; CHR$(24); ","; CHR$(25); ",PgUp,PgDn,Home,End - Ø‡Æ··¨Æ‚‡.  "
@@ -529,8 +570,14 @@ zap:
 
 END SUB
 
-SUB STP (zw)
-IF zw = 1 THEN SOUND 500, .1
+SUB StopSound (sndenable)
+    IF sndenable THEN
+        FOR a = 500 TO 100 STEP -50
+            SOUND a, .1
+        NEXT
+    ELSE
+        SOUND 30000, .5
+    END IF
 END SUB
 
 SUB WZA (zw)
