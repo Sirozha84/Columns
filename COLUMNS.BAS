@@ -464,7 +464,7 @@ GOTO 3
     sc(a) = sc(a - 1)
     NEXT
     nm$(m) = nm$
-    dt$(m) = FORMAT$(NOW, "yyyy-m")
+    dt$(m) = FORMAT$(NOW, "yyyy-mm")
     sc(m) = o
     IF m <> 101 THEN ch = ch + 1
     IF ch > 100 THEN ch = 100
