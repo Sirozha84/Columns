@@ -1,9 +1,12 @@
-DECLARE SUB ZASTAWKA ()
-DECLARE SUB BONUS (zw!)
-DECLARE SUB Game (sp!(), so!(), si!(), zw!, o!)
+DECLARE SUB StopSound ()
+DECLARE SUB KeyClear ()
+DECLARE SUB Bonus ()
+DECLARE SUB Game (z, o)
 DECLARE SUB GameScreen (sp!(), rek!)
+DECLARE SUB Intro ()
 DECLARE SUB KEYCLER ()
-DECLARE SUB MENU (sp!(), so!(), si!())
+DECLARE SUB LoadSprites ()
+DECLARE SUB Menu ()
 DECLARE SUB NXT (so!(), fg!())
 DECLARE SUB pau ()
 DECLARE SUB PST (x!, y!, z!, fg!(), so!())
@@ -11,16 +14,20 @@ DECLARE SUB PSTC (x!, y!, z!, si!())
 DECLARE SUB Quit ()
 DECLARE SUB RecordBroken ()
 DECLARE SUB SCORE (o!)
-DECLARE SUB SPRITE ()
-DECLARE SUB WZA (zw!)
-DECLARE SUB WZB (zw!)
-DECLARE SUB WZC (zw!)
-DECLARE SUB WZD (zw!)
-DECLARE SUB WZE (zw!)
-DECLARE SUB StopSound (sndenable!)
+DECLARE SUB WZA ()
+DECLARE SUB WZB ()
+DECLARE SUB WZC ()
+DECLARE SUB WZD ()
+DECLARE SUB WZE ()
 
-ZASTAWKA
-SPRITE
+DIM SHARED sp(166), so(166), si(166):
+DIM SHARED soundEn
+
+Intro
+LoadSprites
+Menu
+Quit
+END
 
 a:  DATA "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA9999999999999AAA9999999999999AAA9999999999999AAA9999999999999AAA9999999999999AAA"
     DATA "9999999999999AAA9999999999999AAA9999999999999AAA9999999999999AAA9999999999999AAA:::::::::::::9AA::::::::::::::9A:::::::::::::::9"
@@ -51,24 +58,24 @@ wc: DATA "9292292222222222292922292222222292222922292222222922922922222222929222
 wd: DATA "92922222222222222229222222222222922229222222222229229222222222222222229222222222292922292222222222222222222222222929222922222222"
     DATA "92222222222222222229229222222222222229222222222292292222222222222222292222222222929222222222222222222222222222222922222222222222"
 
-SUB BONUS (zw)
-IF zw = 1 THEN
-FOR a = 1 TO 8
-SOUND 500, 1: SOUND 1000, 1
-NEXT
-ELSE
-FOR a = 1 TO 8: SOUND 30000, 2: NEXT
-END IF
+SUB Bonus ()
+    IF soundEn = 1 THEN
+        FOR a = 1 TO 8
+            SOUND 500, 1: SOUND 1000, 1
+        NEXT
+    ELSE
+        FOR a = 1 TO 8: SOUND 30000, 2: NEXT
+    END IF
 END SUB
 
-SUB Game (sp(), so(), si(), zw, o)
+SUB Game (z, o)
     speed = 10
     u$ = CHR$(0) + CHR$(72): d$ = CHR$(0) + CHR$(80)
     l$ = CHR$(0) + CHR$(75): r$ = CHR$(0) + CHR$(77)
     REDIM fg(3, 7), m(0 TO 7, 12): o = 0
     CALL GameScreen(sp(), rek)
     COLOR 9: LOCATE 12, 18: PRINT "ë‚†‡‚ - ´Ó°†Ô ™´†¢®Ë†."
-    KEYCLER
+    KeyClear
     DO
         q$ = INKEY$: LOCATE 1, 36: COLOR 10: PRINT LEFT$(TIME$, 5)
         FOR a = 1 TO 7: FOR s = 1 TO 3: fg(s, a) = INT(RND * 5 + 1): NEXT: NEXT
@@ -78,9 +85,9 @@ SUB Game (sp(), so(), si(), zw, o)
 new:
     IF o > rek THEN RecordBroken
     x = 3: y = 9: z = 0
-    KEYCLER
+    KeyClear
 
-10 :
+10
     LOCATE 1, 36: COLOR 10: PRINT LEFT$(TIME$, 5)
     CALL PST(x, y, z, fg(), so())
     z = z - 1
@@ -91,7 +98,7 @@ new:
         y = y - 1
     END IF
 
-11 :
+11
     q$ = INKEY$
     IF q$ = CHR$(27) THEN GOTO pr1
     IF q$ = d$ THEN
@@ -113,7 +120,7 @@ new:
 
 'é·‚†≠Æ¢™†
 STP:
-    CALL StopSound(zw)
+    StopSound
     IF m(3, 9) <> 0 THEN GOTO GameOver
     FOR a = 1 TO 3: m(x, y - 1 + a) = fg(a, 1): NEXT
     prw = 0: bn = 0
@@ -154,23 +161,23 @@ prow:
         FOR a = 1 TO plus
             PUT (wx(a) * 16 + 1, wy(a) * 16 + 1), si(1), PSET
         NEXT
-        CALL WZA(zw)
+        WZA
         FOR a = 1 TO plus
             PUT (wx(a) * 16 + 1, wy(a) * 16 + 1), si(34), PSET
         NEXT
-        CALL WZB(zw)
+        WZB
         FOR a = 1 TO plus
             PUT (wx(a) * 16 + 1, wy(a) * 16 + 1), si(67), PSET
         NEXT
-        CALL WZC(zw)
+        WZC
         FOR a = 1 TO plus
             PUT (wx(a) * 16 + 1, wy(a) * 16 + 1), si(100), PSET
         NEXT
-        CALL WZD(zw)
+        WZD
         FOR a = 1 TO plus
             PUT (wx(a) * 16 + 1, wy(a) * 16 + 1), si(133), PSET
         NEXT
-        CALL WZE(zw)
+        WZE
         FOR a = 1 TO plus
             IF prw = 1 THEN o = o + 1: CALL SCORE(o)
             IF prw > 1 THEN bn = bn + (prw - 1) * 10
@@ -197,7 +204,7 @@ prow:
         LOCATE 12, 24: COLOR 9: PRINT "Åéçìë";
         COLOR 14: PRINT bn;
         COLOR 9: PRINT "!"
-        CALL BONUS(zw)
+        Bonus
         LOCATE 12, 24: COLOR 0: PRINT "     "; bn; "   "
         o = o + bn: CALL SCORE(o)
     END IF
@@ -226,31 +233,31 @@ GameOver:
             IF m(a, s) > 0 THEN PUT (a * 16 + 1, s * 16 + 1), si(1), PSET
         NEXT
     NEXT
-    CALL WZA(zw)
+    WZA
     FOR a = 1 TO 6
         FOR s = 1 TO 11
             IF m(a, s) > 0 THEN PUT (a * 16 + 1, s * 16 + 1), si(34), PSET
         NEXT
     NEXT
-    CALL WZB(zw)
+    WZB
     FOR a = 1 TO 6
         FOR s = 1 TO 11
             IF m(a, s) > 0 THEN PUT (a * 16 + 1, s * 16 + 1), si(67), PSET
         NEXT
     NEXT
-    CALL WZC(zw)
+    WZC
     FOR a = 1 TO 6
         FOR s = 1 TO 11
             IF m(a, s) > 0 THEN PUT (a * 16 + 1, s * 16 + 1), si(100), PSET
         NEXT
     NEXT
-    CALL WZD(zw)
+    WZD
     FOR a = 1 TO 6
         FOR s = 1 TO 11
             IF m(a, s) > 0 THEN PUT (a * 16 + 1, s * 16 + 1), si(133), PSET
         NEXT
     NEXT
-    CALL WZE(zw)
+    WZE
     FOR a = 0 TO 300 STEP 2
         PSET (a, 1), 0: DRAW "h100e100"
         PSET (320 - a, 1), 0: DRAW "e100h100"
@@ -281,38 +288,156 @@ IF s <> 0 THEN PRINT RIGHT$(s$, LEN(s$) - 1)
 rek = s
 END SUB
 
-SUB KEYCLER ()
-DO: q$ = INKEY$: LOOP UNTIL q$ = ""
+SUB Intro ()
+    SCREEN 13: WINDOW (1, 1)-(320, 200)
+    FOR a = 1 TO 200: PALETTE 0, 0: NEXT
+    COLOR 1: REDIM q$(5): q$(1) = "€€€€  €€€€": q$(2) = "€     €   "
+    q$(3) = "€€€€  € €€": q$(4) = "   €  €  €": q$(5) = "€€€€  €€€€"
+    FOR a = 1 TO 5: PALETTE a, 0: COLOR a: LOCATE a + 7, 15: PRINT q$(a): NEXT
+    PALETTE 6, 0: COLOR 6: LOCATE 17, 14: PRINT "è‡•§·‚†¢´Ô•‚..."
+    FOR a = 0 TO 10
+        PALETTE 1, a * 65536 * 5
+        PALETTE 2, a * 65536 * 4
+        PALETTE 3, a * 65536 * 3
+        PALETTE 4, a * 65536 * 2
+        PALETTE 5, a * 65536 * 1
+        PALETTE 6, a * 256 * 3
+        SOUND 30000, 1
+    NEXT
+    FOR a = 1 TO 10
+        PALETTE 1, a * 65536 * 1 + 65536 * 50
+        PALETTE 2, a * 65536 * 2 + 65536 * 40
+        PALETTE 3, a * 65536 * 3 + 65536 * 30
+        PALETTE 4, a * 65536 * 4 + 65536 * 20
+        PALETTE 5, a * 65536 * 5 + 65536 * 10
+        PALETTE 6, a * 256 * 3 + 256 * 30
+        SOUND 30000, 1
+    NEXT
+    FOR a = 10 TO 1 STEP -1
+        PALETTE 1, a * 65536 * 5 + 65536 * 10
+        PALETTE 2, a * 65536 * 4 + 65536 * 20
+        PALETTE 3, a * 65536 * 3 + 65536 * 30
+        PALETTE 4, a * 65536 * 2 + 65536 * 40
+        PALETTE 5, a * 65536 * 1 + 65536 * 50
+        PALETTE 6, a * 256 * 3 + 256 * 30
+        SOUND 30000, 1
+    NEXT
+    FOR a = 10 TO 0 STEP -1
+        PALETTE 1, a * 65536 * 1
+        PALETTE 2, a * 65536 * 2
+        PALETTE 3, a * 65536 * 3
+        PALETTE 4, a * 65536 * 4
+        PALETTE 5, a * 65536 * 5
+        PALETTE 6, a * 256 * 3
+        SOUND 30000, 1
+    NEXT
+    CLS
+    SCREEN 7: WINDOW (1, 1)-(320, 200)
+    COLOR 8: LINE (160, 30)-(160, 180): FOR a = 30 TO 180 STEP 50
+    LINE (100, a + 10)-(160, a): LINE -(220, a + 10): NEXT
+    LINE (100, 40)-(100, 190): LINE -(160, 200)
+    LINE -(220, 190): LINE -(220, 40)
+    PAINT (160, 190), 11, 8
+    PAINT (150, 180), 9, 8: PAINT (170, 180), 1, 8
+    PAINT (150, 130), 12, 8: PAINT (170, 130), 4, 8
+    PAINT (150, 80), 10, 8: PAINT (170, 80), 2, 8
+    COLOR 1: LOCATE 23, 17: PRINT "COLUMNS"
+    pau
+    COLOR 9: LOCATE 23, 17: PRINT "COLUMNS"
+    pau
+    COLOR 11: LOCATE 23, 17: PRINT "COLUMNS"
+    pau
+    COLOR 15: LOCATE 23, 17: PRINT "COLUMNS"
+    FOR a = 1 TO 100: SOUND 30000, .5
+        IF INKEY$ <> "" THEN EXIT FOR
+    NEXT
+    FOR a = 0 TO 300 STEP 2
+        PSET (a, 1), 0: DRAW "h100e100"
+        PSET (320 - a, 1), 0: DRAW "e100h100"
+        PSET (a - 21, 1), 0: DRAW "h100e100"
+        PSET (341 - a, 1), 0: DRAW "e100h100"
+        SOUND 30000, .2
+    NEXT
 END SUB
 
-SUB MENU (sp(), so(), si())
-u$ = CHR$(0) + CHR$(72): d$ = CHR$(0) + CHR$(80)
-l$ = CHR$(0) + CHR$(75): r$ = CHR$(0) + CHR$(77)
-OPEN "Columns.ini" FOR APPEND AS 1: CLOSE
-OPEN "Columns.ini" FOR INPUT AS 1
-IF EOF(1) = -1 THEN z = 1:  ELSE INPUT #1, z
-CLOSE
-REDIM z$(0 TO 4)
-z$(0) = "                                                                                "
-z$(1) = "∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞"
-z$(2) = "±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±"
-z$(3) = "≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤"
-z$(4) = "€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€"
-1 : SCREEN 0: COLOR 0, 0: CLS
-COLOR 10, 0: LOCATE 1, 36: PRINT LEFT$(TIME$, 5)
-COLOR 4
-LOCATE 11, 1: PRINT z$(1)
-pau
-LOCATE 11, 1: PRINT z$(2): LOCATE 9, 1: PRINT z$(1): LOCATE 13, 1: PRINT z$(1)
-pau
-LOCATE 11, 1: PRINT z$(3): LOCATE 9, 1: PRINT z$(2): LOCATE 13, 1: PRINT z$(2)
-LOCATE 7, 1: PRINT z$(1): LOCATE 15, 1: PRINT z$(1)
-pau
-LOCATE 11, 1: PRINT z$(4): LOCATE 9, 1: PRINT z$(3): LOCATE 13, 1: PRINT z$(3)
-LOCATE 7, 1: PRINT z$(2): LOCATE 15, 1: PRINT z$(2)
-LOCATE 5, 1: PRINT z$(1): LOCATE 17, 1: PRINT z$(1)
-pau
-PCOPY 0, 1
+SUB KeyClear ()
+    DO
+        q$ = INKEY$
+    LOOP UNTIL q$ = ""
+END SUB
+
+SUB LoadSprites () '(sp(), so(), si())
+    SCREEN 7, 1, 1, 0
+    WINDOW (1, 1)-(320, 200)
+    RESTORE a: GOSUB zap: GET (1, 1)-(16, 16), sp(1)
+    RESTORE b: GOSUB zap: GET (1, 1)-(16, 16), sp(34)
+    RESTORE c: GOSUB zap: GET (1, 1)-(16, 16), sp(67)
+    RESTORE d: GOSUB zap: GET (1, 1)-(16, 16), sp(100)
+    RESTORE e: GOSUB zap: GET (1, 1)-(16, 16), sp(133)
+    RESTORE ba: GOSUB zap: GET (1, 1)-(16, 16), so(1)
+    RESTORE bb: GOSUB zap: GET (1, 1)-(16, 16), so(34)
+    RESTORE bc: GOSUB zap: GET (1, 1)-(16, 16), so(67)
+    RESTORE bd: GOSUB zap: GET (1, 1)-(16, 16), so(100)
+    RESTORE be: GOSUB zap: GET (1, 1)-(16, 16), so(133)
+    RESTORE wa: GOSUB zap: GET (1, 1)-(16, 16), si(1)
+    RESTORE wb: GOSUB zap: GET (1, 1)-(16, 16), si(34)
+    RESTORE wc: GOSUB zap: GET (1, 1)-(16, 16), si(67)
+    RESTORE wd: GOSUB zap: GET (1, 1)-(16, 16), si(100)
+    CLS
+    GET (1, 1)-(16, 16), si(133)
+    SCREEN 7, 0, 0, 0
+    'CALL MENU(sp(), so(), si())
+
+    EXIT SUB
+
+zap:
+    READ a$: dl = 1
+    FOR a = 1 TO 8
+        FOR s = 1 TO 16
+            PSET (a, s), ASC(MID$(a$, dl, a)) - 50
+            dl = dl + 1:
+        NEXT
+    NEXT
+    READ a$: dl = 1
+    FOR a = 1 TO 8
+        FOR s = 1 TO 16
+            PSET (a + 8, s), ASC(MID$(a$, dl, a)) - 50
+            dl = dl + 1:
+        NEXT
+    NEXT
+    RETURN
+
+END SUB
+
+SUB Menu ()
+    u$ = CHR$(0) + CHR$(72): d$ = CHR$(0) + CHR$(80)
+    l$ = CHR$(0) + CHR$(75): r$ = CHR$(0) + CHR$(77)
+    OPEN "Columns.ini" FOR APPEND AS 1: CLOSE
+    OPEN "Columns.ini" FOR INPUT AS 1
+        IF EOF(1) = -1 THEN soundEn = 1:  ELSE INPUT #1, soundEn
+    CLOSE
+    REDIM z$(0 TO 4)
+    z$(0) = "                                                                                "
+    z$(1) = "∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞"
+    z$(2) = "±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±"
+    z$(3) = "≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤≤"
+    z$(4) = "€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€"
+1 :
+    SCREEN 0: COLOR 0, 0: CLS
+    COLOR 10, 0: LOCATE 1, 36: PRINT LEFT$(TIME$, 5)
+    COLOR 4
+    LOCATE 11, 1: PRINT z$(1)
+    pau
+    LOCATE 11, 1: PRINT z$(2): LOCATE 9, 1: PRINT z$(1): LOCATE 13, 1: PRINT z$(1)
+    pau
+    LOCATE 11, 1: PRINT z$(3): LOCATE 9, 1: PRINT z$(2): LOCATE 13, 1: PRINT z$(2)
+    LOCATE 7, 1: PRINT z$(1): LOCATE 15, 1: PRINT z$(1)
+    pau
+    LOCATE 11, 1: PRINT z$(4): LOCATE 9, 1: PRINT z$(3): LOCATE 13, 1: PRINT z$(3)
+    LOCATE 7, 1: PRINT z$(2): LOCATE 15, 1: PRINT z$(2)
+    LOCATE 5, 1: PRINT z$(1): LOCATE 17, 1: PRINT z$(1)
+    pau
+    PCOPY 0, 1
 
     COLOR 14: LOCATE 1, 14: PRINT "ã„ÁË®• ®£‡Æ™®:": COLOR 15, 7
     LOCATE 3, 4: PRINT "⁄ƒƒƒƒƒ¬ƒƒƒƒƒƒƒƒƒƒ¬ƒƒƒƒƒƒƒ¬ƒƒƒƒƒƒƒø"
@@ -325,7 +450,7 @@ PCOPY 0, 1
     COLOR 15, 1
     LOCATE 23, 1: PRINT " Enter-·‚†‡‚. Esc-¢ÎÂÆ§. è‡Æ°•´-ß¢„™:   "
     COLOR 14: LOCATE 23, 39
-    IF z = 1 THEN PRINT CHR$(14) ELSE PRINT " "
+    IF soundEn THEN PRINT CHR$(14) ELSE PRINT " "
     COLOR 0, 7
     LOCATE 4, 5: PRINT "å•·‚Æ"
     LOCATE 4, 14: PRINT "à¨Ô"
@@ -344,7 +469,7 @@ PCOPY 0, 1
             END IF
         NEXT
     CLOSE
-    KEYCLER
+    KeyClear
 2 :
     IF ch > 13 THEN
         IF k < 0 THEN k = 0
@@ -374,48 +499,51 @@ PCOPY 0, 1
         END IF
     NEXT
 
-DO: DO: q$ = INKEY$: COLOR 10, 0: LOCATE 1, 36: PRINT LEFT$(TIME$, 5)
-LOOP UNTIL q$ <> ""
-IF q$ = CHR$(27) THEN Quit
-IF q$ = " " THEN
-IF z = 1 THEN z = 0:  ELSE z = 1
-COLOR 14, 1: LOCATE 23, 39
-OPEN "Columns.ini" FOR OUTPUT AS 1
-PRINT #1, z: CLOSE
-IF z = 1 THEN PRINT CHR$(14) ELSE PRINT " "
-END IF
-IF ch > 13 THEN
-IF q$ = u$ AND k <> 0 THEN k = k - 1: GOTO 2
-IF q$ = d$ AND k <> ch - 13 THEN k = k + 1: GOTO 2
-IF q$ = CHR$(0) + CHR$(71) THEN k = 0: GOTO 2
-IF q$ = CHR$(0) + CHR$(79) THEN k = ch - 13: GOTO 2
-IF q$ = CHR$(0) + CHR$(73) THEN k = k - 13: GOTO 2
-IF q$ = CHR$(0) + CHR$(81) THEN k = k + 13: GOTO 2
-END IF
-LOOP UNTIL q$ = CHR$(13)
-PCOPY 1, 0
-COLOR 10, 0: LOCATE 1, 36: PRINT LEFT$(TIME$, 5)
+    DO
+        DO
+            q$ = INKEY$: COLOR 10, 0: LOCATE 1, 36: PRINT LEFT$(TIME$, 5)
+        LOOP UNTIL q$ <> ""
+        IF q$ = CHR$(27) THEN EXIT SUB
+        IF q$ = " " THEN
+            IF soundEn THEN soundEn = 0 ELSE soundEn = 1
+            COLOR 14, 1: LOCATE 23, 39
+            OPEN "Columns.ini" FOR OUTPUT AS 1
+                PRINT #1, soundEn
+            CLOSE
+            IF soundEn THEN PRINT CHR$(14) ELSE PRINT " "
+        END IF
+        IF ch > 13 THEN
+            IF q$ = u$ AND k <> 0 THEN k = k - 1: GOTO 2
+            IF q$ = d$ AND k <> ch - 13 THEN k = k + 1: GOTO 2
+            IF q$ = CHR$(0) + CHR$(71) THEN k = 0: GOTO 2
+            IF q$ = CHR$(0) + CHR$(79) THEN k = ch - 13: GOTO 2
+            IF q$ = CHR$(0) + CHR$(73) THEN k = k - 13: GOTO 2
+            IF q$ = CHR$(0) + CHR$(81) THEN k = k + 13: GOTO 2
+        END IF
+    LOOP UNTIL q$ = CHR$(13)
+    PCOPY 1, 0
+    COLOR 10, 0: LOCATE 1, 36: PRINT LEFT$(TIME$, 5)
 
-COLOR 4, 0
+    COLOR 4, 0
 
-LOCATE 11, 1: PRINT z$(3): LOCATE 9, 1: PRINT z$(2): LOCATE 13, 1: PRINT z$(2)
-LOCATE 7, 1: PRINT z$(1): LOCATE 15, 1: PRINT z$(1)
-LOCATE 5, 1: PRINT z$(0): LOCATE 17, 1: PRINT z$(0)
-pau
-LOCATE 11, 1: PRINT z$(2): LOCATE 9, 1: PRINT z$(1): LOCATE 13, 1: PRINT z$(1)
-LOCATE 7, 1: PRINT z$(0): LOCATE 15, 1: PRINT z$(0)
-pau
-LOCATE 11, 1: PRINT z$(1): LOCATE 9, 1: PRINT z$(0): LOCATE 13, 1: PRINT z$(0)
-pau
-LOCATE 11, 1: PRINT z$(0)
-FOR s = 0 TO 7: PALETTE s, s: NEXT
+    LOCATE 11, 1: PRINT z$(3): LOCATE 9, 1: PRINT z$(2): LOCATE 13, 1: PRINT z$(2)
+    LOCATE 7, 1: PRINT z$(1): LOCATE 15, 1: PRINT z$(1)
+    LOCATE 5, 1: PRINT z$(0): LOCATE 17, 1: PRINT z$(0)
+    pau
+    LOCATE 11, 1: PRINT z$(2): LOCATE 9, 1: PRINT z$(1): LOCATE 13, 1: PRINT z$(1)
+    LOCATE 7, 1: PRINT z$(0): LOCATE 15, 1: PRINT z$(0)
+    pau
+    LOCATE 11, 1: PRINT z$(1): LOCATE 9, 1: PRINT z$(0): LOCATE 13, 1: PRINT z$(0)
+    pau
+    LOCATE 11, 1: PRINT z$(0)
+    FOR s = 0 TO 7: PALETTE s, s: NEXT
 
 
-SCREEN 7
-WINDOW (1, 1)-(320, 200)
-CALL Game(sp(), so(), si(), z, o)
-SCREEN 0
-OPEN "Columns.his" FOR APPEND AS 1: CLOSE
+    SCREEN 7
+    WINDOW (1, 1)-(320, 200)
+    CALL Game(z, o)
+    SCREEN 0
+    OPEN "Columns.his" FOR APPEND AS 1: CLOSE
     OPEN "Columns.his" FOR INPUT AS 1
         REDIM nm$(100), dt$(100), sc(100)
         ch = 0:
@@ -424,34 +552,35 @@ OPEN "Columns.his" FOR APPEND AS 1: CLOSE
         NEXT
     CLOSE
     IF ch = 100 AND sc(100) >= o THEN GOTO 1
-IF o = 0 THEN GOTO 1
-COLOR 10, 0: LOCATE 1, 36: PRINT LEFT$(TIME$, 5)
-COLOR 9, 1
-LOCATE 10, 12: PRINT "⁄ƒƒƒƒƒƒƒƒƒƒƒƒƒƒø"
-LOCATE 11, 12: PRINT "≥              ≥"
-LOCATE 12, 12: PRINT "≥              ≥"
-LOCATE 13, 12: PRINT "≥              ≥"
-LOCATE 14, 12: PRINT "¿ƒƒƒƒƒƒƒƒƒƒƒƒƒƒŸ"
-COLOR 0: LOCATE 13, 15: PRINT "±±±±±±±±±±"
-LOCATE 11, 14: COLOR 14: PRINT "ê•™Æ‡§:"; o
-LOCATE 12, 16: COLOR 9: PRINT "Ç†Ë• ®¨Ô:"
-q = 1
-REDIM b$(10): nm$ = ""
-3 : DO
-COLOR 10, 0: LOCATE 1, 36: PRINT LEFT$(TIME$, 5)
-IF q <> 11 THEN
-COLOR 14, 1: LOCATE 13, 14 + q: PRINT "€": PALETTE 1, 1
-COLOR 0, 1: LOCATE 13, 14 + q: PRINT "±": PALETTE 1, 1
-END IF
-q$ = INKEY$: LOOP UNTIL q$ <> ""
-IF q$ = CHR$(13) THEN GOTO 4
-IF q$ = CHR$(8) AND q <> 1 THEN LOCATE 13, 13 + q: COLOR 0, 1: PRINT "±": q = q - 1
-IF q$ = CHR$(8) THEN GOTO 3
-IF q$ < " " THEN GOTO 3
-IF q = 11 THEN GOTO 3
-LOCATE 13, 14 + q: COLOR 11: PRINT q$
-b$(q) = q$: q = q + 1
-GOTO 3
+    IF o = 0 THEN GOTO 1
+    COLOR 10, 0: LOCATE 1, 36: PRINT LEFT$(TIME$, 5)
+    COLOR 9, 1
+    LOCATE 10, 12: PRINT "⁄ƒƒƒƒƒƒƒƒƒƒƒƒƒƒø"
+    LOCATE 11, 12: PRINT "≥              ≥"
+    LOCATE 12, 12: PRINT "≥              ≥"
+    LOCATE 13, 12: PRINT "≥              ≥"
+    LOCATE 14, 12: PRINT "¿ƒƒƒƒƒƒƒƒƒƒƒƒƒƒŸ"
+    COLOR 0: LOCATE 13, 15: PRINT "±±±±±±±±±±"
+    LOCATE 11, 14: COLOR 14: PRINT "ê•™Æ‡§:"; o
+    LOCATE 12, 16: COLOR 9: PRINT "Ç†Ë• ®¨Ô:"
+    q = 1
+    REDIM b$(10): nm$ = ""
+3
+    DO
+    COLOR 10, 0: LOCATE 1, 36: PRINT LEFT$(TIME$, 5)
+    IF q <> 11 THEN
+        COLOR 14, 1: LOCATE 13, 14 + q: PRINT "€": PALETTE 1, 1
+        COLOR 0, 1: LOCATE 13, 14 + q: PRINT "±": PALETTE 1, 1
+    END IF
+    q$ = INKEY$: LOOP UNTIL q$ <> ""
+    IF q$ = CHR$(13) THEN GOTO 4
+    IF q$ = CHR$(8) AND q <> 1 THEN LOCATE 13, 13 + q: COLOR 0, 1: PRINT "±": q = q - 1
+    IF q$ = CHR$(8) THEN GOTO 3
+    IF q$ < " " THEN GOTO 3
+    IF q = 11 THEN GOTO 3
+    LOCATE 13, 14 + q: COLOR 11: PRINT q$
+    b$(q) = q$: q = q + 1
+    GOTO 3
 
 'á†Ø®·Ï ·‚‡Æ™® ¢ ‚†°´®Ê„ ‡•™Æ‡§Æ¢
 4 :
@@ -488,13 +617,15 @@ FOR a = 1 TO 30: SOUND 30000, .1: NEXT
 END SUB
 
 SUB PST (x, y, z, fg(), so())
-FOR a = 1 TO 3
-PUT (x * 16 + 1, y * 16 + z + a * 16 - 15), so(fg(a, 1) * 33 - 32), PSET: NEXT
+    FOR a = 1 TO 3
+        PUT (x * 16 + 1, y * 16 + z + a * 16 - 15), so(fg(a, 1) * 33 - 32), PSET
+    NEXT
 END SUB
 
 SUB PSTC (x, y, z, si())
-FOR a = 1 TO 3
-PUT (x * 16 + 1, y * 16 + z + a * 16 - 15), si(133), PSET: NEXT
+    FOR a = 1 TO 3
+        PUT (x * 16 + 1, y * 16 + z + a * 16 - 15), si(133), PSET
+    NEXT
 END SUB
 
 SUB Quit ()
@@ -504,7 +635,6 @@ SUB Quit ()
     PRINT "Ç•‡·®Ô: 1.1 (30.12.2016)"
     PRINT "Ä¢‚Æ‡: ë•‡£•© ÉÆ‡§••¢"
     PRINT "ë†©‚: www.sg-software.ru"
-    SYSTEM
 END SUB
 
 SUB RecordBroken ()
@@ -526,52 +656,8 @@ LOCATE 17, 33 - LEN(o$)
 IF o <> 0 THEN PRINT RIGHT$(o$, LEN(o$) - 1)
 END SUB
 
-SUB SPRITE ()
-    DIM sp(166), so(166), si(166):
-    SCREEN 7, 1, 1, 0
-    WINDOW (1, 1)-(320, 200)
-    RESTORE a: GOSUB zap: GET (1, 1)-(16, 16), sp(1)
-    RESTORE b: GOSUB zap: GET (1, 1)-(16, 16), sp(34)
-    RESTORE c: GOSUB zap: GET (1, 1)-(16, 16), sp(67)
-    RESTORE d: GOSUB zap: GET (1, 1)-(16, 16), sp(100)
-    RESTORE e: GOSUB zap: GET (1, 1)-(16, 16), sp(133)
-    RESTORE ba: GOSUB zap: GET (1, 1)-(16, 16), so(1)
-    RESTORE bb: GOSUB zap: GET (1, 1)-(16, 16), so(34)
-    RESTORE bc: GOSUB zap: GET (1, 1)-(16, 16), so(67)
-    RESTORE bd: GOSUB zap: GET (1, 1)-(16, 16), so(100)
-    RESTORE be: GOSUB zap: GET (1, 1)-(16, 16), so(133)
-    RESTORE wa: GOSUB zap: GET (1, 1)-(16, 16), si(1)
-    RESTORE wb: GOSUB zap: GET (1, 1)-(16, 16), si(34)
-    RESTORE wc: GOSUB zap: GET (1, 1)-(16, 16), si(67)
-    RESTORE wd: GOSUB zap: GET (1, 1)-(16, 16), si(100)
-    CLS
-    GET (1, 1)-(16, 16), si(133)
-    SCREEN 7, 0, 0, 0
-    CALL MENU(sp(), so(), si())
-
-    END
-
-zap:
-    READ a$: dl = 1
-    FOR a = 1 TO 8
-        FOR s = 1 TO 16
-            PSET (a, s), ASC(MID$(a$, dl, a)) - 50
-            dl = dl + 1:
-        NEXT
-    NEXT
-    READ a$: dl = 1
-    FOR a = 1 TO 8
-        FOR s = 1 TO 16
-            PSET (a + 8, s), ASC(MID$(a$, dl, a)) - 50
-            dl = dl + 1:
-        NEXT
-    NEXT
-    RETURN
-
-END SUB
-
-SUB StopSound (sndenable)
-    IF sndenable THEN
+SUB StopSound ()
+    IF soundEn THEN
         FOR a = 500 TO 100 STEP -50
             SOUND a, .1
         NEXT
@@ -580,113 +666,43 @@ SUB StopSound (sndenable)
     END IF
 END SUB
 
-SUB WZA (zw)
-IF zw = 1 THEN
-FOR a = 1 TO 50: SOUND RND * 50 + 250, .03: NEXT
-ELSE
-FOR a = 1 TO 15: PALETTE a, a: NEXT
-END IF
+SUB WZA ()
+    IF soundEn THEN
+        FOR a = 1 TO 50: SOUND RND * 50 + 250, .03: NEXT
+    ELSE
+        FOR a = 1 TO 15: PALETTE a, a: NEXT
+    END IF
 END SUB
 
-SUB WZB (zw)
-IF zw = 1 THEN
-FOR a = 1 TO 50: SOUND RND * 50 + 200, .03: NEXT
-ELSE
-FOR a = 1 TO 15: PALETTE a, a: NEXT
-END IF
+SUB WZB ()
+    IF soundEn THEN
+        FOR a = 1 TO 50: SOUND RND * 50 + 200, .03: NEXT
+    ELSE
+        FOR a = 1 TO 15: PALETTE a, a: NEXT
+    END IF
 END SUB
 
-SUB WZC (zw)
-IF zw = 1 THEN
-FOR a = 1 TO 50: SOUND RND * 50 + 150, .03: NEXT
-ELSE
-FOR a = 1 TO 15: PALETTE a, a: NEXT
-END IF
+SUB WZC ()
+    IF soundEn THEN
+        FOR a = 1 TO 50: SOUND RND * 50 + 150, .03: NEXT
+    ELSE
+        FOR a = 1 TO 15: PALETTE a, a: NEXT
+    END IF
 END SUB
 
-SUB WZD (zw)
-IF zw = 1 THEN
-FOR a = 1 TO 50: SOUND RND * 50 + 100, .03: NEXT
-ELSE
-FOR a = 1 TO 50: SOUND 30000, .03: NEXT
-END IF
+SUB WZD ()
+    IF soundEn THEN
+        FOR a = 1 TO 50: SOUND RND * 50 + 100, .03: NEXT
+    ELSE
+        FOR a = 1 TO 50: SOUND 30000, .03: NEXT
+    END IF
 END SUB
 
-SUB WZE (zw)
-IF zw = 1 THEN
-FOR a = 1 TO 50: SOUND RND * 50 + 50, .03: NEXT
-ELSE
-FOR a = 1 TO 15: PALETTE a, a: NEXT
-END IF
-END SUB
-
-SUB ZASTAWKA ()
-SCREEN 13: WINDOW (1, 1)-(320, 200)
-FOR a = 1 TO 200: PALETTE 0, 0: NEXT
-COLOR 1: REDIM q$(5): q$(1) = "€€€€  €€€€": q$(2) = "€     €   "
-q$(3) = "€€€€  € €€": q$(4) = "   €  €  €": q$(5) = "€€€€  €€€€"
-FOR a = 1 TO 5: PALETTE a, 0: COLOR a: LOCATE a + 7, 15: PRINT q$(a): NEXT
-PALETTE 6, 0: COLOR 6: LOCATE 17, 14: PRINT "è‡•§·‚†¢´Ô•‚..."
-FOR a = 0 TO 10
-PALETTE 1, a * 65536 * 5
-PALETTE 2, a * 65536 * 4
-PALETTE 3, a * 65536 * 3
-PALETTE 4, a * 65536 * 2
-PALETTE 5, a * 65536 * 1
-PALETTE 6, a * 256 * 3
-SOUND 30000, 1
-NEXT: FOR a = 1 TO 10
-PALETTE 1, a * 65536 * 1 + 65536 * 50
-PALETTE 2, a * 65536 * 2 + 65536 * 40
-PALETTE 3, a * 65536 * 3 + 65536 * 30
-PALETTE 4, a * 65536 * 4 + 65536 * 20
-PALETTE 5, a * 65536 * 5 + 65536 * 10
-PALETTE 6, a * 256 * 3 + 256 * 30
-SOUND 30000, 1
-NEXT: FOR a = 10 TO 1 STEP -1
-PALETTE 1, a * 65536 * 5 + 65536 * 10
-PALETTE 2, a * 65536 * 4 + 65536 * 20
-PALETTE 3, a * 65536 * 3 + 65536 * 30
-PALETTE 4, a * 65536 * 2 + 65536 * 40
-PALETTE 5, a * 65536 * 1 + 65536 * 50
-PALETTE 6, a * 256 * 3 + 256 * 30
-SOUND 30000, 1
-NEXT: FOR a = 10 TO 0 STEP -1
-PALETTE 1, a * 65536 * 1
-PALETTE 2, a * 65536 * 2
-PALETTE 3, a * 65536 * 3
-PALETTE 4, a * 65536 * 4
-PALETTE 5, a * 65536 * 5
-PALETTE 6, a * 256 * 3
-SOUND 30000, 1
-NEXT: CLS
-
-SCREEN 7: WINDOW (1, 1)-(320, 200)
-COLOR 8: LINE (160, 30)-(160, 180): FOR a = 30 TO 180 STEP 50
-LINE (100, a + 10)-(160, a): LINE -(220, a + 10): NEXT
-LINE (100, 40)-(100, 190): LINE -(160, 200)
-LINE -(220, 190): LINE -(220, 40)
-PAINT (160, 190), 11, 8
-PAINT (150, 180), 9, 8: PAINT (170, 180), 1, 8
-PAINT (150, 130), 12, 8: PAINT (170, 130), 4, 8
-PAINT (150, 80), 10, 8: PAINT (170, 80), 2, 8
-COLOR 1: LOCATE 23, 17: PRINT "COLUMNS"
-pau
-COLOR 9: LOCATE 23, 17: PRINT "COLUMNS"
-pau
-COLOR 11: LOCATE 23, 17: PRINT "COLUMNS"
-pau
-COLOR 15: LOCATE 23, 17: PRINT "COLUMNS"
-FOR a = 1 TO 100: SOUND 30000, .5
-IF INKEY$ <> "" THEN EXIT FOR
-NEXT
-FOR a = 0 TO 300 STEP 2
-PSET (a, 1), 0: DRAW "h100e100"
-PSET (320 - a, 1), 0: DRAW "e100h100"
-PSET (a - 21, 1), 0: DRAW "h100e100"
-PSET (341 - a, 1), 0: DRAW "e100h100"
-SOUND 30000, .2
-NEXT
-
+SUB WZE ()
+    IF soundEn THEN
+        FOR a = 1 TO 50: SOUND RND * 50 + 50, .03: NEXT
+    ELSE
+        FOR a = 1 TO 15: PALETTE a, a: NEXT
+    END IF
 END SUB
 
