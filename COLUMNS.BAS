@@ -1,19 +1,18 @@
-DECLARE SUB StopSound ()
-DECLARE SUB KeyClear ()
+DECLARE SUB About ()
 DECLARE SUB Bonus ()
-DECLARE SUB Game (z, o)
+DECLARE SUB DrawNext (so!(), fg!())
+DECLARE SUB Game (z!, o!)
 DECLARE SUB GameScreen (sp!(), rek!)
 DECLARE SUB Intro ()
-DECLARE SUB KEYCLER ()
+DECLARE SUB KeyClear ()
 DECLARE SUB LoadSprites ()
 DECLARE SUB Menu ()
-DECLARE SUB NXT (so!(), fg!())
 DECLARE SUB pau ()
 DECLARE SUB PST (x!, y!, z!, fg!(), so!())
 DECLARE SUB PSTC (x!, y!, z!, si!())
-DECLARE SUB Quit ()
 DECLARE SUB RecordBroken ()
-DECLARE SUB SCORE (o!)
+DECLARE SUB Score (o!)
+DECLARE SUB StopSound ()
 DECLARE SUB WZA ()
 DECLARE SUB WZB ()
 DECLARE SUB WZC ()
@@ -26,7 +25,7 @@ DIM SHARED soundEn
 Intro
 LoadSprites
 Menu
-Quit
+About
 END
 
 a:  DATA "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA9999999999999AAA9999999999999AAA9999999999999AAA9999999999999AAA9999999999999AAA"
@@ -58,6 +57,15 @@ wc: DATA "9292292222222222292922292222222292222922292222222922922922222222929222
 wd: DATA "92922222222222222229222222222222922229222222222229229222222222222222229222222222292922292222222222222222222222222929222922222222"
     DATA "92222222222222222229229222222222222229222222222292292222222222222222292222222222929222222222222222222222222222222922222222222222"
 
+SUB About ()
+    SCREEN 0: WIDTH 80, 25: COLOR 7, 0: CLS
+    PRINT "COLUMNS"
+    PRINT
+    PRINT "Ç•‡·®Ô: 1.1 (07.01.2017)"
+    PRINT "Ä¢‚Æ‡: ë•‡£•© ÉÆ‡§••¢"
+    PRINT "ë†©‚: www.sg-software.ru"
+END SUB
+
 SUB Bonus ()
     IF soundEn = 1 THEN
         FOR a = 1 TO 8
@@ -66,6 +74,14 @@ SUB Bonus ()
     ELSE
         FOR a = 1 TO 8: SOUND 30000, 2: NEXT
     END IF
+END SUB
+
+SUB DrawNext (so(), fg())
+    FOR a = 2 TO 7
+        FOR s = 1 TO 3
+            PUT (a * 32 + 80, s * 16 + 128), so(fg(s, a) * 33 - 32), PSET
+        NEXT
+    NEXT
 END SUB
 
 SUB Game (z, o)
@@ -79,7 +95,7 @@ SUB Game (z, o)
     DO
         q$ = INKEY$: LOCATE 1, 36: COLOR 10: PRINT LEFT$(TIME$, 5)
         FOR a = 1 TO 7: FOR s = 1 TO 3: fg(s, a) = INT(RND * 5 + 1): NEXT: NEXT
-        CALL NXT(so(), fg())
+        CALL DrawNext(so(), fg())
     LOOP UNTIL q$ <> "": LOCATE 12, 18: PRINT "                      "
 
 new:
@@ -179,7 +195,7 @@ prow:
         NEXT
         WZE
         FOR a = 1 TO plus
-            IF prw = 1 THEN o = o + 1: CALL SCORE(o)
+            IF prw = 1 THEN o = o + 1: CALL Score(o)
             IF prw > 1 THEN bn = bn + (prw - 1) * 10
         NEXT
         FOR a = 1 TO plus: m(wx(a), wy(a)) = 0: NEXT
@@ -206,7 +222,7 @@ prow:
         COLOR 9: PRINT "!"
         Bonus
         LOCATE 12, 24: COLOR 0: PRINT "     "; bn; "   "
-        o = o + bn: CALL SCORE(o)
+        o = o + bn: CALL Score(o)
     END IF
     FOR a = 1 TO 6
         FOR s = 1 TO 3
@@ -214,7 +230,7 @@ prow:
         NEXT
     NEXT
     FOR a = 1 TO 3: fg(a, 7) = INT(RND * 5 + 1): NEXT
-    CALL NXT(so(), fg())
+    CALL DrawNext(so(), fg())
     GOTO new
 pr1:
     PCOPY 0, 1: COLOR 1
@@ -269,23 +285,27 @@ GameOver:
 END SUB
 
 SUB GameScreen (sp(), rek)
-CLS : PUT (1, 1), sp(67), PSET: FOR a = 1 TO 6: PUT (a * 16 + 1, 1), sp(100), PSET
-NEXT: PUT (113, 1), sp(133), PSET
-FOR a = 1 TO 10: PUT (1, a * 16), sp(34), PSET
-PUT (113, a * 16), sp(34), PSET: NEXT
-PUT (1, 176), sp(1), PSET: PUT (113, 176), sp(1), PSET
-COLOR 1: LOCATE 9, 24: PRINT "ëãÖÑìûôàÖ"
-LOCATE 15, 27: PRINT "éóäà": LOCATE 21, 26: PRINT "êÖäéêÑ"
-COLOR 5: LOCATE 17, 26: PRINT "000000"
-COLOR 6: LOCATE 23, 26: PRINT "000000"
-OPEN "Columns.his" FOR APPEND AS 1: CLOSE
-OPEN "Columns.his" FOR INPUT AS 1
-IF EOF(1) = -1 THEN s = 0 ELSE INPUT #1, s$, d$, s
-CLOSE
-COLOR 14: s$ = STR$(s)
-LOCATE 23, 33 - LEN(s$)
-IF s <> 0 THEN PRINT RIGHT$(s$, LEN(s$) - 1)
-rek = s
+    CLS : PUT (1, 1), sp(67), PSET
+    FOR a = 1 TO 6
+        PUT (a * 16 + 1, 1), sp(100), PSET
+    NEXT: PUT (113, 1), sp(133), PSET
+    FOR a = 1 TO 10
+        PUT (1, a * 16), sp(34), PSET
+        PUT (113, a * 16), sp(34), PSET
+    NEXT
+    PUT (1, 176), sp(1), PSET: PUT (113, 176), sp(1), PSET
+    COLOR 1: LOCATE 9, 24: PRINT "ëãÖÑìûôàÖ"
+    LOCATE 15, 27: PRINT "éóäà": LOCATE 21, 26: PRINT "êÖäéêÑ"
+    COLOR 5: LOCATE 17, 26: PRINT "000000"
+    COLOR 6: LOCATE 23, 26: PRINT "000000"
+    OPEN "Columns.his" FOR APPEND AS 1: CLOSE
+    OPEN "Columns.his" FOR INPUT AS 1
+        IF EOF(1) = -1 THEN s = 0 ELSE INPUT #1, s$, d$, s
+    CLOSE
+    COLOR 14: s$ = STR$(s)
+    LOCATE 23, 33 - LEN(s$)
+    IF s <> 0 THEN PRINT RIGHT$(s$, LEN(s$) - 1)
+    rek = s
 END SUB
 
 SUB Intro ()
@@ -606,14 +626,8 @@ SUB Menu ()
 
 END SUB
 
-SUB NXT (so(), fg())
-FOR a = 2 TO 7: FOR s = 1 TO 3
-PUT (a * 32 + 80, s * 16 + 128), so(fg(s, a) * 33 - 32), PSET
-NEXT: NEXT
-END SUB
-
 SUB pau ()
-FOR a = 1 TO 30: SOUND 30000, .1: NEXT
+    FOR a = 1 TO 30: SOUND 30000, .1: NEXT
 END SUB
 
 SUB PST (x, y, z, fg(), so())
@@ -626,15 +640,6 @@ SUB PSTC (x, y, z, si())
     FOR a = 1 TO 3
         PUT (x * 16 + 1, y * 16 + z + a * 16 - 15), si(133), PSET
     NEXT
-END SUB
-
-SUB Quit ()
-    SCREEN 0: WIDTH 80, 25: COLOR 7, 0: CLS
-    PRINT "COLUMNS"
-    PRINT
-    PRINT "Ç•‡·®Ô: 1.1 (30.12.2016)"
-    PRINT "Ä¢‚Æ‡: ë•‡£•© ÉÆ‡§••¢"
-    PRINT "ë†©‚: www.sg-software.ru"
 END SUB
 
 SUB RecordBroken ()
@@ -650,10 +655,10 @@ SUB RecordBroken ()
     NEXT
 END SUB
 
-SUB SCORE (o)
-COLOR 13: o$ = STR$(o)
-LOCATE 17, 33 - LEN(o$)
-IF o <> 0 THEN PRINT RIGHT$(o$, LEN(o$) - 1)
+SUB Score (o)
+    COLOR 13: o$ = STR$(o)
+    LOCATE 17, 33 - LEN(o$)
+    IF o <> 0 THEN PRINT RIGHT$(o$, LEN(o$) - 1)
 END SUB
 
 SUB StopSound ()
@@ -694,7 +699,7 @@ SUB WZD ()
     IF soundEn THEN
         FOR a = 1 TO 50: SOUND RND * 50 + 100, .03: NEXT
     ELSE
-        FOR a = 1 TO 50: SOUND 30000, .03: NEXT
+        FOR a = 1 TO 15: PALETTE a, a: NEXT
     END IF
 END SUB
 
